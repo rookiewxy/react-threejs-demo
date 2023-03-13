@@ -5,7 +5,6 @@
  * @LastEditTime: 2023-03-13 19:26:04
  */
 import Demo from './page/demo'
-import './App.css'
 
 function App() {
 
