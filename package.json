@@ -4,22 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-<<<<<<< HEAD
     "start": "vite",
-=======
-    "dev": "vite",
->>>>>>> 0967e5e55254be5b7752483d8094ba6b7f8d6e69
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-<<<<<<< HEAD
-  }, 
-=======
+    "react-dom": "^18.2.0",
+    "three": "^0.150.1"
   },
->>>>>>> 0967e5e55254be5b7752483d8094ba6b7f8d6e69
   "devDependencies": {
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
