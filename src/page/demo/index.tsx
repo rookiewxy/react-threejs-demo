@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import * as THREE from 'three'
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 const Demo = () => {
 
@@ -16,24 +17,51 @@ const Demo = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
         container?.appendChild(renderer.domElement);
 
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-        camera.position.z = 5;
-        console.log(cube);
-        
-        function animate() {
-            requestAnimationFrame(animate);
+        // 环境光
+        scene.add(new THREE.AmbientLight(4210752, 3));
+        // 平行光
+        var light = new THREE.DirectionalLight(16777215, 1);
+        light.position.set(0, 50, 50);
+        scene.add(light);
+        camera.position.z = 300;
+        camera.position.y = 10;
 
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
 
-            renderer.render(scene, camera);
-        }
+        const loader = new FBXLoader()
+        loader.load('model/demo.fbx', (object) => {
+            object.traverse(function (child) {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+
+            });
+            object.scale.multiplyScalar(.1);
+            object.position.set(0,0,10)
+            scene.add(object);
 
         animate();
+        }, onProgress, onError)
+
+
+        function animate() {
+            requestAnimationFrame( animate );
+            renderer.render( scene, camera );
+        }
+
     }
+
+    function onProgress(xhr) {
+        if (xhr.lengthComputable) {
+            var percentComplete = xhr.loaded / xhr.total * 100;
+            console.log(Math.round(percentComplete, 2) + '% downloaded');
+        }
+    };
+
+    function onError(xhr) {
+        console.error(xhr);
+    };
+
 
     return <div id="container"></div>
 }
