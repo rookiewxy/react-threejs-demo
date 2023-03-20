@@ -18,32 +18,18 @@ let labelRenderer: any = null;
 let camera: any = null;
 let scene: any = null;
 let renderer: any = null;
-const cameraPos = new THREE.Vector3(0, 900, 1500);
+let controls: any = null;
+const cameraPos = new THREE.Vector3(0, 0, 1500);
 
 const Demo = () => {
   const [data, setData] = useState("");
+
   useEffect(() => {
     initContainer();
   }, []);
 
-  const initContainer = () => {
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(
-      100,
-      window.innerWidth / window.innerHeight,
-      1,
-      10000
-    );
-    camera.lookAt(scene.position);
-
-    // 环境光
-    scene.add(new THREE.AmbientLight("#494b52", 4));
-    // 平行光
-    const light = new THREE.DirectionalLight(16777215, 1);
-    scene.add(light);
-
-    camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
-
+  // 初始化渲染器
+  const initRenderer = () => {
     const container = document.getElementById("container");
 
     renderer = new THREE.WebGLRenderer();
@@ -55,10 +41,42 @@ const Demo = () => {
     labelRenderer.domElement.style.position = "absolute";
     labelRenderer.domElement.style.top = "0px";
     container?.appendChild(labelRenderer.domElement);
+    labelRenderer.domElement.addEventListener("click", onMouseClick);
 
-    const controls = new OrbitControls(camera, labelRenderer.domElement);
+  }
+
+  // 初始化相机
+  const initCamera = () => {
+    camera = new THREE.PerspectiveCamera(
+      90,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      10000
+    );
+    camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
+  }
+
+  // 初始化场景
+  const initScene = () => {
+    scene = new THREE.Scene();
+  }
+
+  // 初始化光源
+  const initLight = () => {
+    // 环境光
+    scene.add(new THREE.AmbientLight("#494b52", 4));
+    // 平行光
+    const light = new THREE.DirectionalLight(16777215, 1);
+    scene.add(light);
+
+  }
+
+  const initOrbitControls = () =>{
+    controls = new OrbitControls(camera, labelRenderer.domElement);
     controls?.update();
+  }
 
+  const initFbxModel = () => {
     const loader = new FBXLoader();
     loader.load(
       "model/a.fbx",
@@ -69,25 +87,32 @@ const Demo = () => {
             child.receiveShadow = true;
           }
         });
+        object.position.y = -300 
         object.scale.multiplyScalar(0.1);
         scene.add(object);
       },
       onProgress,
       onError
     );
+  }
 
+  const initContainer = () => {
+    initRenderer()
+    initCamera()
+    initScene()
+    initLight()
+    initOrbitControls()
+    initFbxModel()
     addCSS3DLabelToScene();
-    labelRenderer.domElement.addEventListener("click", onMouseClick);
-
     animate();
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      labelRenderer?.render(scene, camera);
-      renderer?.render(scene, camera);
-    }
   };
 
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    labelRenderer?.render(scene, camera);
+    renderer?.render(scene, camera);
+  }
   const addCSS3DLabelToScene = () => {
     const element = document.getElementById("div");
     css3DObject = new CSS3DObject(element);
@@ -113,7 +138,10 @@ const Demo = () => {
       css3DObject.visible = true;
       css3DObject.position.x = intersects[0].point.x;
       css3DObject.position.y = intersects[0].point.y;
-      css3DObject.position.z = intersects[0].point.z;
+      console.log(intersects[0].object);
+      intersects[0].object.material = new THREE.MeshPhongMaterial({
+        color:0xff0000
+      })
       setData(intersects[0].object.name);
     } else {
       css3DObject.visible = false;

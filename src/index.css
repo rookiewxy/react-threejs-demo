@@ -6,6 +6,7 @@ body {
   overflow: hidden;
 }
 #div {
+  position: absolute;
   width: 300px;
   height: 200px;
   background: url('./assets/bg.png') no-repeat;
